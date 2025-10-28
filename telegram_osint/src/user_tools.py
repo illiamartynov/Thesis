@@ -1,3 +1,8 @@
+import asyncio
+import json
+import os
+import time
+from datetime import datetime
 
 from tg_client import client
 from telethon.tl.functions.contacts import ImportContactsRequest, DeleteContactsRequest
@@ -5,10 +10,9 @@ from telethon.tl.types import InputPhoneContact
 from telethon.tl.types import UserStatusOnline, UserStatusOffline, UserStatusRecently, UserStatusLastMonth, UserStatusLastWeek
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import PeerUser
-import json
-import os
-import time
-from datetime import datetime
+import nest_asyncio
+nest_asyncio.apply()
+
 
 async def _get_user_by_phone(phone):
     contact = InputPhoneContact(client_id=0, phone=phone, first_name="Not Known", last_name="Not Known")
@@ -17,25 +21,28 @@ async def _get_user_by_phone(phone):
     await client(DeleteContactsRequest(id=[user]))
     return user
 
+
 async def _get_user_by_username(username):
     user = await client.get_entity(username)
     return user
 
+
 def format_status(status):
     if isinstance(status, UserStatusOnline):
-        return f"Онлайн (до {status.expires.strftime('%Y-%m-%d %H:%M:%S')})"
+        return f"Online (until {status.expires.strftime('%Y-%m-%d %H:%M:%S')})"
     elif isinstance(status, UserStatusOffline):
-        return f"Был в сети {status.was_online.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"Last seen at {status.was_online.strftime('%Y-%m-%d %H:%M:%S')}"
     elif isinstance(status, UserStatusRecently):
-        return "Был в сети недавно"
+        return "Last seen recently"
     elif isinstance(status, UserStatusLastWeek):
-        return "Был в сети на этой неделе"
+        return "Last seen this week"
     elif isinstance(status, UserStatusLastMonth):
-        return "Был в сети в этом месяце"
+        return "Last seen this month"
     elif status is None:
-        return "Статус скрыт"
+        return "Status is hidden"
     else:
         return str(status)
+
 
 def save_user_profile(user, full_user):
     data = {
@@ -56,6 +63,7 @@ def save_user_profile(user, full_user):
     with open(os.path.join(path, "profile.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
+
 async def download_avatar(user):
     if user.photo:
         username = user.username.lstrip("@") if user.username else None
@@ -63,6 +71,7 @@ async def download_avatar(user):
         os.makedirs(f"data/{folder_name}/avatars", exist_ok=True)
         path = f"data/{folder_name}/avatars/{user.id}.jpg"
         await client.download_profile_photo(user, file=path)
+
 
 def fetch_user_by_username(username):
     async def run():
@@ -72,11 +81,12 @@ def fetch_user_by_username(username):
             full_user = await client(GetFullUserRequest(user.id))
             await download_avatar(user)
             save_user_profile(user, full_user)
-            print(f"[+] Профиль пользователя {user.username or user.id} сохранён.")
+            print(f"[+] User profile {user.username or user.id} saved.")
         else:
-            print("Пользователь не найден.")
+            print("User not found.")
         await client.disconnect()
-    client.loop.run_until_complete(run())
+    asyncio.run(run())
+
 
 def fetch_user_by_phone(phone):
     async def run():
@@ -86,11 +96,12 @@ def fetch_user_by_phone(phone):
             full_user = await client(GetFullUserRequest(user.id))
             await download_avatar(user)
             save_user_profile(user, full_user)
-            print(f"[+] Профиль пользователя {user.username or user.id} сохранён.")
+            print(f"[+] User profile {user.username or user.id} saved.")
         else:
-            print("Пользователь не найден.")
+            print("User not found.")
         await client.disconnect()
-    client.loop.run_until_complete(run())
+    asyncio.run(run())
+
 
 def _serialize_message(message):
     def safe_to_dict(obj):
@@ -122,7 +133,7 @@ def fetch_user_messages_from_chat(user_username, chat_username, limit=500000):
         await client.start()
         user = await _get_user_by_username(user_username)
         if not user:
-            print("Пользователь не найден.")
+            print("User not found.")
             return
 
         messages = []
@@ -136,16 +147,17 @@ def fetch_user_messages_from_chat(user_username, chat_username, limit=500000):
         with open(f"data/{folder_name}/messages_{chat_username}.json", "w", encoding="utf-8") as f:
             json.dump(messages, f, indent=4, ensure_ascii=False)
 
-        print(f"[+] Всего сообщений: {len(messages)} в @{chat_username}")
+        print(f"[+] Total messages: {len(messages)} in @{chat_username}")
         await client.disconnect()
-    client.loop.run_until_complete(run())
+    asyncio.run(run())
+
 
 def fetch_user_messages_from_multiple_chats(user_username, chat_usernames: list, limit=500000):
     async def run():
         await client.start()
         user = await _get_user_by_username(user_username)
         if not user:
-            print("Пользователь не найден.")
+            print("User not found.")
             return
 
         username = user.username.lstrip("@") if user.username else None
@@ -156,7 +168,7 @@ def fetch_user_messages_from_multiple_chats(user_username, chat_usernames: list,
         total_start = time.perf_counter()
 
         for i, chat_username in enumerate(chat_usernames, 1):
-            print(f"\n[{i}/{total_chats}] [{datetime.now().strftime('%H:%M:%S')}] Обработка @{chat_username}...")
+            print(f"\n[{i}/{total_chats}] [{datetime.now().strftime('%H:%M:%S')}] Processing @{chat_username}...")
             start = time.perf_counter()
             messages = []
             try:
@@ -168,14 +180,14 @@ def fetch_user_messages_from_multiple_chats(user_username, chat_usernames: list,
                     json.dump(messages, f, indent=4, ensure_ascii=False)
 
                 duration = time.perf_counter() - start
-                print(f"[+] @{chat_username}: {len(messages)} сообщений сохранено за {duration:.2f} сек.")
+                print(f"[+] @{chat_username}: {len(messages)} messages saved in {duration:.2f} sec.")
                 total_messages += len(messages)
 
             except Exception as e:
-                print(f"[!] Ошибка при обработке @{chat_username}: {e}")
+                print(f"[!] Error processing @{chat_username}: {e}")
 
         total_duration = time.perf_counter() - total_start
-        print(f"\n✅ Завершено: {total_chats} чатов, {total_messages} сообщений за {total_duration:.2f} сек.")
+        print(f"\n✅ Completed: {total_chats} chats, {total_messages} messages in {total_duration:.2f} sec.")
         await client.disconnect()
 
-    client.loop.run_until_complete(run())
+    asyncio.run(run())

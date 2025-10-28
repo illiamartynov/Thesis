@@ -22,7 +22,7 @@ def analyze_mentions(user_folder, top_n=20):
                 mentions = mention_pattern.findall(text)
                 mention_counter.update(mentions)
 
-    print(f"\n🔗 Топ-{top_n} упоминаемых пользователей:")
+    print(f"\n🔗 Top-{top_n} mentioned users:")
     for mention, count in mention_counter.most_common(top_n):
         print(f"{mention:<20} {count}")
 
@@ -30,9 +30,9 @@ def analyze_mentions(user_folder, top_n=20):
         out_path = os.path.join(user_folder, "mentions.json")
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(mention_counter.most_common(), f, indent=4, ensure_ascii=False)
-        print(f"\n✅ Упоминания сохранены в: {out_path}")
+        print(f"\n✅ Mentions saved to: {out_path}")
     else:
-        print("❗ Упоминания не найдены.")
+        print("❗ No mentions found.")
 
 
 def analyze_replies(user_folder, top_n=10):
@@ -99,7 +99,7 @@ def analyze_replies(user_folder, top_n=10):
                                 msg_id_to_user[reply_id] = replied_to_user
                                 all_users.add(replied_to_user)
                     except Exception as e:
-                        print(f"[!] Ошибка загрузки сообщения #{reply_id}: {e}")
+                        print(f"[!] Failed to fetch message #{reply_id}: {e}")
                         continue
 
                 if user_id and replied_to_user and user_id != replied_to_user:
@@ -122,7 +122,7 @@ def analyze_replies(user_folder, top_n=10):
                 except:
                     id_to_name[uid] = str(uid)
 
-        print(f"\n↩️ Топ-{top_n} reply-связей:")
+        print(f"\n↩️ Top-{top_n} reply pairs:")
         if reply_counter:
             for (uid1, uid2), count in reply_counter.most_common(top_n):
                 name1 = id_to_name.get(uid1, str(uid1))
@@ -136,9 +136,9 @@ def analyze_replies(user_folder, top_n=10):
             ]
             with open(out_path, "w", encoding="utf-8") as f:
                 json.dump(reply_data, f, indent=4, ensure_ascii=False)
-            print(f"\n✅ Ответы сохранены в: {out_path}")
+            print(f"\n✅ Replies saved to: {out_path}")
         else:
-            print("❗ Ответы не найдены.")
+            print("❗ No replies found.")
 
         await client.disconnect()
 

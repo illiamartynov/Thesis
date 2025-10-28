@@ -5,8 +5,11 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 
 
-def analyze_hourly_activity(user_folder):
-    """Анализ активности по часам из всех messages_*.json и отрисовка графика"""
+def analyze_hourly_activity(user_folder, save_path=None):
+    """
+    Analyze user activity by hour based on all messages_*.json files in the user folder.
+    If save_path is provided — saves the chart, otherwise displays it.
+    """
     message_files = [f for f in os.listdir(user_folder) if f.startswith("messages_") and f.endswith(".json")]
     hour_counter = Counter()
 
@@ -21,17 +24,20 @@ def analyze_hourly_activity(user_folder):
                 except Exception:
                     continue
 
-    # Подготовка данных для графика
     hours = list(range(24))
     counts = [hour_counter.get(h, 0) for h in hours]
 
-    # Рисуем график
     plt.figure(figsize=(10, 5))
-    plt.bar(hours, counts)
+    plt.bar(hours, counts, color="skyblue")
     plt.xticks(hours)
-    plt.xlabel("Час суток")
-    plt.ylabel("Количество сообщений")
-    plt.title("Активность пользователя по часам")
-    plt.grid(axis="y", linestyle="--", alpha=0.5)
+    plt.xlabel("Hour of day")
+    plt.ylabel("Number of messages")
+    plt.title("User activity by hour")
+    plt.grid(axis="y", linestyle="--", alpha=0.6)
     plt.tight_layout()
-    plt.show()
+
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()
