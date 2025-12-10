@@ -7,56 +7,58 @@
 </head>
 <body class="bg-light">
 
-<div class="container py-5">
-    <div class="card shadow-sm">
+<div class="container py-5 d-flex justify-content-center">
+
+    <div class="card shadow-sm" style="width: 700px;">
         <div class="card-header bg-dark text-white">
             Search and collect messages
         </div>
+
         <div class="card-body">
 
-            <!-- 1. Search by username -->
             <h5 class="card-title">1. Find by username</h5>
-            <form class="row g-3 mb-4" action="/search_by_username" method="post">
-                <div class="col-md-10">
+            <form class="row g-3 mb-4 align-items-center" action="/search_by_username" method="post">
+                <div class="col-auto">
                     <input type="text" name="username" class="form-control" placeholder="username (without @)" required>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Import</button>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Import</button>
                 </div>
             </form>
 
-            <!-- 2. Search by phone number -->
             <h5 class="card-title">2. Find by phone number</h5>
-            <form class="row g-3 mb-4" action="/search_by_phone" method="post">
-                <div class="col-md-10">
+            <form class="row g-3 mb-4 align-items-center" action="/search_by_phone" method="post">
+                <div class="col-auto">
                     <input type="text" name="phone" class="form-control" placeholder="+123456789" required>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Import</button>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Import</button>
                 </div>
             </form>
 
-            <!-- 3. Single chat -->
             <h5 class="card-title">3. Collect messages from one chat</h5>
-            <form class="row g-3 mb-4" action="/collect_single_chat" method="post">
-                <div class="col-md-5">
-                    <input type="text" name="user_username" class="form-control" placeholder="user's username (without @)" required>
+            <form class="row g-3 mb-4 align-items-center" action="/collect_single_chat" method="post">
+                <div class="col-auto">
+                    <input type="text" name="user_username" class="form-control" placeholder="user username" required>
                 </div>
-                <div class="col-md-5">
-                    <input type="text" name="chat_username" class="form-control" placeholder="chat username (without @)" required>
+                <div class="col-auto">
+                    <input type="text" name="chat_username" class="form-control" placeholder="chat username" required>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-secondary w-100">Collect</button>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-secondary">Collect</button>
                 </div>
             </form>
 
-            <!-- 4. Multiple chats -->
             <h5 class="card-title">4. Collect messages from multiple chats</h5>
             <form class="row g-3" action="/collect_multiple_chats" method="post">
                 <div class="col-12">
-                    <input type="text" name="user_username" class="form-control mb-2" placeholder="user's username (without @)" required>
-                    <textarea name="chat_usernames" class="form-control" rows="3" placeholder="chat usernames separated by commas" required></textarea>
+                    <input type="text" name="user_username" class="form-control mb-2"
+                           placeholder="user username" required>
+
+                    <textarea name="chat_usernames" class="form-control" rows="3"
+                              placeholder="chat usernames separated by commas" required></textarea>
                 </div>
+
                 <div class="col-12 text-end">
                     <button type="submit" class="btn btn-secondary">Collect</button>
                 </div>
@@ -64,10 +66,10 @@
 
         </div>
     </div>
+</div>
 
-    <div class="text-center mt-4">
-        <a href="/" class="btn btn-outline-dark">← Back</a>
-    </div>
+<div class="text-center mt-4">
+    <a href="/" class="btn btn-outline-dark">← Back</a>
 </div>
 
 </body>

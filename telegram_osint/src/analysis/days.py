@@ -5,7 +5,7 @@ from collections import Counter
 from datetime import datetime
 import matplotlib
 
-matplotlib.use('Agg')  # Для работы без GUI
+matplotlib.use('Agg') 
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 

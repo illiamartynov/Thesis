@@ -1,18 +1,16 @@
 import os
 import sys
 import json
+from time import time
 from flask import Flask, render_template, redirect, url_for, request
 
-# Добавляем src в sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
-# Импорты функций анализа
 from analysis.activity import analyze_hourly_activity
 from analysis.days import analyze_weekday_activity
 from analysis.keywords import analyze_keywords
 from analysis.interactions import analyze_mentions, analyze_replies
 
-# Импорты поиска и сбора
 from user_tools import (
     fetch_user_by_username,
     fetch_user_by_phone,
@@ -20,7 +18,6 @@ from user_tools import (
     fetch_user_messages_from_multiple_chats
 )
 
-# Flask конфигурация
 app = Flask(
     __name__,
     template_folder="web/templates",
@@ -41,8 +38,7 @@ def profile(username):
     folder = os.path.join(DATA_DIR, username)
     profile_path = os.path.join(folder, "profile.json")
     if not os.path.exists(profile_path):
-        return f"Профиль {username} не найден", 404
-
+        return f"Profile {username} not found", 404
     with open(profile_path, encoding="utf-8") as f:
         profile = json.load(f)
     return render_template("profile.html", username=username, profile=profile)
@@ -51,36 +47,76 @@ def profile(username):
 @app.route("/activity/<username>")
 def activity(username):
     folder = os.path.join(DATA_DIR, username)
-    analyze_hourly_activity(folder, save_path="web/static/activity.png")
-    return render_template("activity.html", username=username, image="activity.png")
+    fname = f"activity_{username}.png"
+    save_path = os.path.join(app.static_folder, fname)
+    analyze_hourly_activity(folder, save_path=save_path)
+    image_url = url_for("static", filename=fname) + f"?v={int(time())}"
+    return render_template(
+        "visualization.html",
+        title="Hourly Activity Chart",
+        username=username,
+        image_url=image_url
+    )
 
 
 @app.route("/days/<username>")
 def days(username):
     folder = os.path.join(DATA_DIR, username)
-    analyze_weekday_activity(folder, save_path="web/static/days.png")
-    return render_template("activity.html", username=username, image="days.png")
+    fname = f"days_{username}.png"
+    save_path = os.path.join(app.static_folder, fname)
+    analyze_weekday_activity(folder, save_path=save_path)
+    image_url = url_for("static", filename=fname) + f"?v={int(time())}"
+    return render_template(
+        "visualization.html",
+        title="Weekly Activity Chart",
+        username=username,
+        image_url=image_url
+    )
 
 
 @app.route("/keywords/<username>")
 def keywords(username):
     folder = os.path.join(DATA_DIR, username)
-    analyze_keywords(folder)
-    return f"Анализ слов для {username} завершён."
+    fname = f"keywords_{username}.png"
+    save_path = os.path.join(app.static_folder, fname)
+    analyze_keywords(folder, save_path=save_path)
+    image_url = url_for("static", filename=fname) + f"?v={int(time())}"
+    return render_template(
+        "visualization.html",
+        title="Keyword Frequency",
+        username=username,
+        image_url=image_url
+    )
 
 
 @app.route("/mentions/<username>")
 def mentions(username):
     folder = os.path.join(DATA_DIR, username)
-    analyze_mentions(folder)
-    return f"Анализ упоминаний для {username} завершён."
+    fname = f"mentions_{username}.png"
+    save_path = os.path.join(app.static_folder, fname)
+    analyze_mentions(folder, top_n=20, save_path=save_path)
+    image_url = url_for("static", filename=fname) + f"?v={int(time())}"
+    return render_template(
+        "visualization.html",
+        title="Top Mentions",
+        username=username,
+        image_url=image_url
+    )
 
 
 @app.route("/replies/<username>")
 def replies(username):
     folder = os.path.join(DATA_DIR, username)
-    analyze_replies(folder)
-    return f"Анализ ответов для {username} завершён."
+    fname = f"replies_{username}.png"
+    save_path = os.path.join(app.static_folder, fname)
+    analyze_replies(folder, top_n=15, save_path=save_path)
+    image_url = url_for("static", filename=fname) + f"?v={int(time())}"
+    return render_template(
+        "visualization.html",
+        title="Reply Pairs",
+        username=username,
+        image_url=image_url
+    )
 
 
 @app.route("/tools")

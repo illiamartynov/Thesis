@@ -16,53 +16,53 @@ def select_user_folder():
     base_path = "data"
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     if not folders:
-        print("Нет сохранённых пользователей. Используй пункты 1–4, чтобы добавить нового.")
+        print("No saved users found. Use options 1–4 to add a new one.")
         return None
 
-    print("\nСуществующие пользователи:")
+    print("\nExisting users:")
     for i, name in enumerate(folders, 1):
         print(f"{i}. {name}")
-    print("0. Ввести нового пользователя")
+    print("0. Enter a new user")
 
-    choice = input("Выбери пользователя или 0 для нового: ").strip()
+    choice = input("Choose a user or 0 to add a new one: ").strip()
     if choice == "0":
         return None
     try:
         idx = int(choice) - 1
         return os.path.join(base_path, folders[idx])
     except:
-        print("Некорректный выбор.")
+        print("Invalid choice.")
         return None
 
 
 def cli_menu():
     while True:
         print("\nTelegram OSINT CLI")
-        print("1. Поиск по username")
-        print("2. Поиск по номеру телефона")
-        print("3. Сбор сообщений пользователя в чате (один)")
-        print("4. Сбор сообщений пользователя в нескольких чатах")
-        print("5. Анализ активности по времени (график)")
-        print("6. Анализ активности по дням недели (график)")
-        print("7. Частотный анализ слов (без AI)")
-        print("8. Анализ упоминаний @username")
-        print("9. Анализ кому отвечает пользователь (reply)")
-        print("0. Выход")
+        print("1. Search by username")
+        print("2. Search by phone number")
+        print("3. Collect messages in a single chat")
+        print("4. Collect messages in multiple chats")
+        print("5. Analyze activity by hour (chart)")
+        print("6. Analyze activity by weekday (chart)")
+        print("7. Keyword frequency analysis (no AI)")
+        print("8. Analyze @username mentions")
+        print("9. Analyze reply relationships (who replies to whom)")
+        print("0. Exit")
 
-        choice = input("Выбери опцию: ")
+        choice = input("Choose an option: ")
         if choice == "1":
-            username = input("Введите username (без @): ")
+            username = input("Enter username (without @): ")
             fetch_user_by_username(username)
         elif choice == "2":
-            phone = input("Введите номер (в формате +123456789): ")
+            phone = input("Enter phone number (+123456789 format): ")
             fetch_user_by_phone(phone)
         elif choice == "3":
-            user_username = input("Введите username пользователя (без @): ")
-            chat_username = input("Введите username чата/группы (без @): ")
+            user_username = input("Enter the user's username (without @): ")
+            chat_username = input("Enter chat/group username (without @): ")
             fetch_user_messages_from_chat(user_username, chat_username)
         elif choice == "4":
-            user_username = input("Введите username пользователя (без @): ")
-            raw_chats = input("Введите username чатов через запятую (без @): ")
+            user_username = input("Enter the user's username (without @): ")
+            raw_chats = input("Enter chat usernames separated by commas (without @): ")
             chat_usernames = [chat.strip() for chat in raw_chats.split(",") if chat.strip()]
             fetch_user_messages_from_multiple_chats(user_username, chat_usernames)
         elif choice == "5":
@@ -70,33 +70,33 @@ def cli_menu():
             if user_folder:
                 analyze_hourly_activity(user_folder)
             else:
-                print("OSINT можно запустить через пункты 1–4 для нового пользователя.")
+                print("OSINT can be run via options 1–4 for a new user.")
         elif choice == "6":
             user_folder = select_user_folder()
             if user_folder:
                 analyze_weekday_activity(user_folder)
             else:
-                print("OSINT можно запустить через пункты 1–4 для нового пользователя.")
+                print("OSINT can be run via options 1–4 for a new user.")
         elif choice == "7":
             user_folder = select_user_folder()
             if user_folder:
                 analyze_keywords(user_folder)
             else:
-                print("OSINT можно запустить через пункты 1–4 для нового пользователя.")
+                print("OSINT can be run via options 1–4 for a new user.")
         elif choice == "8":
             user_folder = select_user_folder()
             if user_folder:
                 analyze_mentions(user_folder)
             else:
-                print("OSINT можно запустить через пункты 1–4 для нового пользователя.")
+                print("OSINT can be run via options 1–4 for a new user.")
         elif choice == "9":
             user_folder = select_user_folder()
             if user_folder:
                 analyze_replies(user_folder)
             else:
-                print("OSINT можно запустить через пункты 1–4 для нового пользователя.")
+                print("OSINT can be run via options 1–4 for a new user.")
         elif choice == "0":
-            print("Выход из программы.")
+            print("Exiting program.")
             break
         else:
-            print("Неверный ввод, попробуй снова.")
+            print("Invalid input, try again.")
