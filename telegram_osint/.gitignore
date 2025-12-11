@@ -1,0 +1,11 @@
+.env
+pycache/
+data/
+!data/.gitkeep
+*.session
+*.session-journal
+web/static/*.png
+instance/
+*.pid
+*.log
+~/.cache/matplotlib

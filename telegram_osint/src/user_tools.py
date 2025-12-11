@@ -187,7 +187,7 @@ def fetch_user_messages_from_multiple_chats(user_username, chat_usernames: list,
                 print(f"[!] Error processing @{chat_username}: {e}")
 
         total_duration = time.perf_counter() - total_start
-        print(f"\n✅ Completed: {total_chats} chats, {total_messages} messages in {total_duration:.2f} sec.")
+        print(f"\n Completed: {total_chats} chats, {total_messages} messages in {total_duration:.2f} sec.")
         await client.disconnect()
 
     asyncio.run(run())
